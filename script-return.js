@@ -25,13 +25,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const districtName = await response.text();
             console.log("District Name:", districtName);
 
-            // Second API call to Google Script - UPDATED URL
+            // Second API call to Google Script
             const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyCotN8vkC8HzLZ4IUHXLDwg9RsKbc4fJZRFZWOlJ8SQOAKMsdhe1SH4kj7h0dRKnYS/exec?search=${encodeURIComponent(districtName)}`;
             const apiResponse = await fetch(googleScriptUrl);
             if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
             
             const jsonData = await apiResponse.json();
-            console.log("API Response Data:", jsonData);
+            console.log("API Response Data:", jsonData); // Debug the actual response
 
             // Clear the container completely before adding new content
             ridingTableDiv.innerHTML = '';
@@ -41,8 +41,17 @@ document.addEventListener("DOMContentLoaded", function() {
             districtHeading.textContent = `Candidates in ${districtName}`;
             ridingTableDiv.appendChild(districtHeading);
 
-            // Display the data
-            displayDataInDiv(jsonData, ridingTableDiv);
+            // Display the data with error handling
+            try {
+                displayDataInDiv(jsonData, ridingTableDiv);
+            } catch (displayError) {
+                console.error("Display Error:", displayError);
+                ridingTableDiv.innerHTML += '<p class="error">Error displaying candidate data.</p>';
+                // Show raw data for debugging
+                const debugDiv = document.createElement('pre');
+                debugDiv.textContent = JSON.stringify(jsonData, null, 2);
+                ridingTableDiv.appendChild(debugDiv);
+            }
 
         } catch (error) {
             console.error("Error:", error);
@@ -58,37 +67,75 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Process each item in the data array
-        jsonData.forEach(obj => {
+        jsonData.forEach((obj, index) => {
             if (!obj) return;
+            
+            console.log(`Processing item ${index}:`, obj); // Debug each item
             
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
             
-            // Create h3 with columns F and C
+            // Create h3 with columns F and C - handle different data structures
             const h3 = document.createElement('h3');
-            const fValue = obj['F'] || '';
-            const cValue = obj['C'] || '';
+            let fValue, cValue;
+            
+            // Try different ways to access the data
+            if (obj['F'] !== undefined && obj['C'] !== undefined) {
+                // Case 1: Column letter keys
+                fValue = obj['F'] || '';
+                cValue = obj['C'] || '';
+            } else if (obj['f'] !== undefined && obj['c'] !== undefined) {
+                // Case 2: Lowercase column letters
+                fValue = obj['f'] || '';
+                cValue = obj['c'] || '';
+            } else if (obj[5] !== undefined && obj[2] !== undefined) {
+                // Case 3: Array index (0-based, F=5, C=2)
+                fValue = obj[5] || '';
+                cValue = obj[2] || '';
+            } else {
+                // Case 4: Try to find values by header names
+                const headers = Object.keys(obj);
+                const fKey = headers.find(k => k.toLowerCase().includes('firstname') || headers[5];
+                const cKey = headers.find(k => k.toLowerCase().includes('lastname') || headers[2];
+                fValue = fKey ? obj[fKey] || '' : '';
+                cValue = cKey ? obj[cKey] || '' : '';
+            }
+            
             h3.textContent = `${fValue}, ${cValue}`;
             itemDiv.appendChild(h3);
             
-            // Add column G as bold/italic paragraph if it exists
-            if (obj['G']) {
+            // Add column G (or equivalent) as bold/italic paragraph if it exists
+            const gValue = obj['G'] || obj['g'] || obj[6] || 
+                          Object.values(obj).find(v => typeof v === 'string' && v.includes('Party'));
+            if (gValue) {
                 const gParagraph = document.createElement('p');
-                gParagraph.innerHTML = `<strong><em>${obj['G']}</em></strong>`;
+                gParagraph.innerHTML = `<strong><em>${gValue}</em></strong>`;
                 itemDiv.appendChild(gParagraph);
             }
             
             // Create unordered list for specific columns
             const ul = document.createElement('ul');
             
-            // Define columns we want to include
-            const columnsToShow = ['H', 'I', 'J', 'K', 'L'];
+            // Define columns we want to include (H,I,J,K,L or equivalent)
+            const columnsToCheck = [
+                ['H','I','J','K','L'],  // Case 1: Uppercase letters
+                ['h','i','j','k','l'],  // Case 2: Lowercase letters
+                [7,8,9,10,11],          // Case 3: Array indices
+                Object.keys(obj).slice(7,12) // Case 4: First 5 properties after F,G
+            ];
+            
+            // Find which set of columns exists in our data
+            const availableColumns = columnsToCheck.find(colSet => 
+                colSet.some(col => obj[col] !== undefined)
+            ) || [];
             
             // Add specified columns to the list
-            columnsToShow.forEach(col => {
-                if (obj[col] !== undefined && obj[col] !== '') {
+            availableColumns.forEach(col => {
+                if (obj[col] !== undefined && obj[col] !== null && obj[col] !== '') {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${col}:</strong> ${obj[col]}`;
+                    // Try to get a label for the column
+                    const label = typeof col === 'string' ? col : `Field ${col}`;
+                    li.innerHTML = `<strong>${label}:</strong> ${obj[col]}`;
                     ul.appendChild(li);
                 }
             });
@@ -166,6 +213,14 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #000000;
             min-width: 100px;
             display: inline-block;
+        }
+        
+        /* Debug styles */
+        #riding-table pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
         }
     `;
     document.head.appendChild(style);
