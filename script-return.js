@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table > h3 {
-            color: #000000;
+            color: #f0f0f0;
             font-size: 22px;
             margin-bottom: 20px;
             padding-bottom: 10px;
@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function() {
         #riding-table ol {
             margin: 10px 0 0 0;
             padding-left: 20px;
+            color: #000000;
         }
         
         #riding-table li {
