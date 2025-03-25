@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", function() {
             const jsonData = await apiResponse.json();
             console.log("API Response Data:", jsonData);
 
-            // Add district heading before the data
+            // Clear the container completely before adding new content
+            ridingTableDiv.innerHTML = '';
+
+            // Add district heading
             const districtHeading = document.createElement('h3');
             districtHeading.textContent = `Candidates in ${districtName}`;
             ridingTableDiv.appendChild(districtHeading);
@@ -47,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Modified function to use h3 instead of h1
     function displayDataInDiv(jsonData, container) {
         // Check if data is valid
         if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
@@ -86,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Updated CSS styles
+    // Updated CSS styles with your preferences
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
