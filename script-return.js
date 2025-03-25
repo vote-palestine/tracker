@@ -91,11 +91,10 @@ document.addEventListener("DOMContentLoaded", function() {
     style.textContent = `
         #riding-table {
             margin-top: 20px;
-            font-family: Arial, sans-serif;
         }
         
         #riding-table > h3 {
-            color: #2c3e50;
+            color: #000000;
             font-size: 22px;
             margin-bottom: 20px;
             padding-bottom: 10px;
@@ -105,13 +104,13 @@ document.addEventListener("DOMContentLoaded", function() {
         #riding-table .loading {
             padding: 20px;
             text-align: center;
-            color: #666;
+            color: #f0f0f0;
         }
         
         #riding-table .error {
-            color: #d9534f;
+            color: #000000;
             padding: 15px;
-            background: #f8d7da;
+            background: #b0ecac;
             border-radius: 4px;
             text-align: center;
         }
@@ -134,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table .data-item h3 {
-            color: #2c3e50;
+            color: #000000;
             margin: 0 0 10px 0;
             font-size: 18px;
         }
@@ -151,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table strong {
-            color: #f0f0f0;
+            color: #000000;
             min-width: 100px;
             display: inline-block;
         }
