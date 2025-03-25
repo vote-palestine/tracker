@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
             padding: 15px;
             border: 1px solid #e1e1e1;
             border-radius: 6px;
-            background: white;
+            background: #b0ecac;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
