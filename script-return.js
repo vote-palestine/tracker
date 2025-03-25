@@ -1,22 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("address");
-    if (!form) {
-        console.error("Form with ID 'address' not found");
-        return;
-    }
-
-    form.addEventListener("submit", async function(event) {
+    document.getElementById("address").addEventListener("submit", async function(event) {
         event.preventDefault();
         console.log("Form submitted!");
 
-        const postalInput = document.getElementById("postal");
-        if (!postalInput) {
-            console.error("Postal code input not found");
-            return;
-        }
-
         // Get and validate postal code
-        const postalCode = postalInput.value.replace(/\s+/g, "").toUpperCase().trim();
+        const postalCode = document.getElementById("postal").value.replace(/\s+/g, "").toUpperCase().trim();
         const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/;
         
         if (!postalCodeRegex.test(postalCode)) {
@@ -26,27 +14,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Show loading state
         const ridingTableDiv = document.getElementById('riding-table');
-        if (!ridingTableDiv) {
-            console.error("Div with ID 'riding-table' not found");
-            return;
-        }
         ridingTableDiv.innerHTML = '<div class="loading">Loading data...</div>';
 
         try {
             // First API call to get district name
             const workerUrl = `https://green-paper-72c4.hello-ef7.workers.dev/${postalCode}`;
-            console.log("Fetching district from:", workerUrl);
             const response = await fetch(workerUrl);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) throw new Error("Failed to fetch district data");
             
             const districtName = await response.text();
             console.log("District Name:", districtName);
 
             // Second API call to Google Script
             const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyCotN8vkC8HzLZ4IUHXLDwg9RsKbc4fJZRFZWOlJ8SQOAKMsdhe1SH4kj7h0dRKnYS/exec?search=${encodeURIComponent(districtName)}`;
-            console.log("Fetching candidates from:", googleScriptUrl);
             const apiResponse = await fetch(googleScriptUrl);
-            if (!apiResponse.ok) throw new Error(`HTTP error! status: ${apiResponse.status}`);
+            if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
             
             const jsonData = await apiResponse.json();
             console.log("API Response Data:", jsonData);
@@ -64,71 +46,60 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } catch (error) {
             console.error("Error:", error);
-            if (ridingTableDiv) {
-                ridingTableDiv.innerHTML = '<p class="error">Error loading data. Please try again later.</p>';
-            }
+            ridingTableDiv.innerHTML = '<p class="error">Error loading data. Please try again later.</p>';
         }
     });
 
     function displayDataInDiv(jsonData, container) {
-        if (!jsonData || !Array.isArray(jsonData)) {
+        // Check if data is valid
+        if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
             container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
             return;
         }
 
-        jsonData.forEach(obj => {
-            if (!obj || typeof obj !== 'object') return;
+        // Process each candidate in the data array
+        jsonData.forEach(candidate => {
+            if (!candidate) return;
             
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
             
-            // Get values using multiple possible key formats
-            const getValue = (keys) => {
-                for (const key of keys) {
-                    if (obj[key] !== undefined) return obj[key];
-                }
-                return '';
-            };
-
-            // Create h3 with columns F and C
+            // Create h3 with Candidate and Party
             const h3 = document.createElement('h3');
-            const fValue = getValue(['F', 'f', 'FirstName', 'firstname', 'Name', 'name', 5]);
-            const cValue = getValue(['C', 'c', 'LastName', 'lastname', 2]);
-            h3.textContent = `${fValue}, ${cValue}`;
+            h3.textContent = `${candidate['Candidat.e'] || ''}, ${candidate['Party - Parti'] || ''}`;
             itemDiv.appendChild(h3);
             
-            // Add column G as bold/italic paragraph if it exists
-            const gValue = getValue(['G', 'g', 'Party', 'party', 6]);
-            if (gValue) {
-                const gParagraph = document.createElement('p');
-                gParagraph.innerHTML = `<strong><em>${gValue}</em></strong>`;
-                itemDiv.appendChild(gParagraph);
+            // Add Incumbent as bold/italic paragraph if it exists
+            if (candidate['Incumbent']) {
+                const incumbentPara = document.createElement('p');
+                incumbentPara.innerHTML = `<strong><em>${candidate['Incumbent']}</em></strong>`;
+                itemDiv.appendChild(incumbentPara);
             }
             
-            // Create unordered list for specific columns
+            // Create unordered list for Demands
             const ul = document.createElement('ul');
             
-            // Try to find columns H-L
-            const columnsToShow = ['H', 'I', 'J', 'K', 'L', 'h', 'i', 'j', 'k', 'l', 7, 8, 9, 10, 11];
-            columnsToShow.forEach(col => {
-                const value = obj[col];
-                if (value !== undefined && value !== null && value !== '') {
+            // Add each Demand.e field that exists
+            for (let i = 1; i <= 5; i++) {
+                const demandKey = `Demand.e ${i}`;
+                if (candidate[demandKey]) {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${col}:</strong> ${value}`;
+                    li.innerHTML = `<strong>${demandKey}:</strong> ${candidate[demandKey]}`;
                     ul.appendChild(li);
                 }
-            });
+            }
             
             itemDiv.appendChild(ul);
             container.appendChild(itemDiv);
         });
     }
 
-    // Add CSS styles
+    // CSS styles
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
             margin-top: 20px;
+            font-family: Arial, sans-serif;
         }
         
         #riding-table > h3 {
@@ -174,6 +145,11 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #000000;
             margin: 0 0 10px 0;
             font-size: 18px;
+        }
+        
+        #riding-table .data-item p {
+            margin: 0 0 10px 0;
+            font-size: 16px;
         }
         
         #riding-table ul {
