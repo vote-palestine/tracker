@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Form submission handler
     document.getElementById("address").addEventListener("submit", async function(event) {
         event.preventDefault();
         console.log("Form submitted!");
@@ -32,8 +31,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
             
             const jsonData = await apiResponse.json();
-            console.log("API Response Data:", jsonData); // Debugging
-            
+            console.log("API Response Data:", jsonData);
+
+            // Add district heading before the data
+            const districtHeading = document.createElement('h3');
+            districtHeading.textContent = `Candidates in ${districtName}`;
+            ridingTableDiv.appendChild(districtHeading);
+
             // Display the data
             displayDataInDiv(jsonData, ridingTableDiv);
 
@@ -43,14 +47,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Function to display data in the div
+    // Modified function to use h3 instead of h1
     function displayDataInDiv(jsonData, container) {
-        // Clear container
-        container.innerHTML = '';
-
         // Check if data is valid
         if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
-            container.innerHTML = '<p class="no-data">No riding data found for this postal code.</p>';
+            container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
             return;
         }
 
@@ -61,11 +62,11 @@ document.addEventListener("DOMContentLoaded", function() {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
             
-            // Add Riding as H1 (if exists)
+            // Add Riding as h3 (if exists)
             if (obj['Riding']) {
-                const h1 = document.createElement('h1');
-                h1.textContent = obj['Riding'];
-                itemDiv.appendChild(h1);
+                const h3 = document.createElement('h3');
+                h3.textContent = obj['Riding'];
+                itemDiv.appendChild(h3);
             }
             
             // Create ordered list for other properties
@@ -85,12 +86,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Add CSS styles dynamically
+    // Updated CSS styles
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
             margin-top: 20px;
             font-family: Arial, sans-serif;
+        }
+        
+        #riding-table > h3 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
         }
         
         #riding-table .loading {
@@ -116,36 +125,34 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table .data-item {
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
             border: 1px solid #e1e1e1;
-            border-radius: 8px;
+            border-radius: 6px;
             background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        #riding-table h1 {
+        #riding-table .data-item h3 {
             color: #2c3e50;
-            margin: 0 0 15px 0;
-            font-size: 24px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            margin: 0 0 10px 0;
+            font-size: 18px;
         }
         
         #riding-table ol {
             margin: 10px 0 0 0;
-            padding-left: 25px;
+            padding-left: 20px;
         }
         
         #riding-table li {
-            margin-bottom: 8px;
-            line-height: 1.5;
+            margin-bottom: 6px;
+            line-height: 1.4;
             padding-left: 5px;
         }
         
         #riding-table strong {
             color: #f0f0f0;
-            min-width: 120px;
+            min-width: 100px;
             display: inline-block;
         }
     `;
