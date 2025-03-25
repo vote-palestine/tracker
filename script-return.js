@@ -1,10 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("address").addEventListener("submit", async function(event) {
+    const form = document.getElementById("address");
+    if (!form) {
+        console.error("Form with ID 'address' not found");
+        return;
+    }
+
+    form.addEventListener("submit", async function(event) {
         event.preventDefault();
         console.log("Form submitted!");
 
+        const postalInput = document.getElementById("postal");
+        if (!postalInput) {
+            console.error("Postal code input not found");
+            return;
+        }
+
         // Get and validate postal code
-        const postalCode = document.getElementById("postal").value.replace(/\s+/g, "").toUpperCase().trim();
+        const postalCode = postalInput.value.replace(/\s+/g, "").toUpperCase().trim();
         const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/;
         
         if (!postalCodeRegex.test(postalCode)) {
@@ -14,24 +26,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Show loading state
         const ridingTableDiv = document.getElementById('riding-table');
+        if (!ridingTableDiv) {
+            console.error("Div with ID 'riding-table' not found");
+            return;
+        }
         ridingTableDiv.innerHTML = '<div class="loading">Loading data...</div>';
 
         try {
             // First API call to get district name
             const workerUrl = `https://green-paper-72c4.hello-ef7.workers.dev/${postalCode}`;
+            console.log("Fetching district from:", workerUrl);
             const response = await fetch(workerUrl);
-            if (!response.ok) throw new Error("Failed to fetch district data");
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
             const districtName = await response.text();
             console.log("District Name:", districtName);
 
             // Second API call to Google Script
             const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyCotN8vkC8HzLZ4IUHXLDwg9RsKbc4fJZRFZWOlJ8SQOAKMsdhe1SH4kj7h0dRKnYS/exec?search=${encodeURIComponent(districtName)}`;
+            console.log("Fetching candidates from:", googleScriptUrl);
             const apiResponse = await fetch(googleScriptUrl);
-            if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
+            if (!apiResponse.ok) throw new Error(`HTTP error! status: ${apiResponse.status}`);
             
             const jsonData = await apiResponse.json();
-            console.log("API Response Data:", jsonData); // Debug the actual response
+            console.log("API Response Data:", jsonData);
 
             // Clear the container completely before adding new content
             ridingTableDiv.innerHTML = '';
@@ -41,72 +59,46 @@ document.addEventListener("DOMContentLoaded", function() {
             districtHeading.textContent = `Candidates in ${districtName}`;
             ridingTableDiv.appendChild(districtHeading);
 
-            // Display the data with error handling
-            try {
-                displayDataInDiv(jsonData, ridingTableDiv);
-            } catch (displayError) {
-                console.error("Display Error:", displayError);
-                ridingTableDiv.innerHTML += '<p class="error">Error displaying candidate data.</p>';
-                // Show raw data for debugging
-                const debugDiv = document.createElement('pre');
-                debugDiv.textContent = JSON.stringify(jsonData, null, 2);
-                ridingTableDiv.appendChild(debugDiv);
-            }
+            // Display the data
+            displayDataInDiv(jsonData, ridingTableDiv);
 
         } catch (error) {
             console.error("Error:", error);
-            ridingTableDiv.innerHTML = '<p class="error">Error loading data. Please try again later.</p>';
+            if (ridingTableDiv) {
+                ridingTableDiv.innerHTML = '<p class="error">Error loading data. Please try again later.</p>';
+            }
         }
     });
 
     function displayDataInDiv(jsonData, container) {
-        // Check if data is valid
-        if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
+        if (!jsonData || !Array.isArray(jsonData)) {
             container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
             return;
         }
 
-        // Process each item in the data array
-        jsonData.forEach((obj, index) => {
-            if (!obj) return;
-            
-            console.log(`Processing item ${index}:`, obj); // Debug each item
+        jsonData.forEach(obj => {
+            if (!obj || typeof obj !== 'object') return;
             
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
             
-            // Create h3 with columns F and C - handle different data structures
+            // Get values using multiple possible key formats
+            const getValue = (keys) => {
+                for (const key of keys) {
+                    if (obj[key] !== undefined) return obj[key];
+                }
+                return '';
+            };
+
+            // Create h3 with columns F and C
             const h3 = document.createElement('h3');
-            let fValue, cValue;
-            
-            // Try different ways to access the data
-            if (obj['F'] !== undefined && obj['C'] !== undefined) {
-                // Case 1: Column letter keys
-                fValue = obj['F'] || '';
-                cValue = obj['C'] || '';
-            } else if (obj['f'] !== undefined && obj['c'] !== undefined) {
-                // Case 2: Lowercase column letters
-                fValue = obj['f'] || '';
-                cValue = obj['c'] || '';
-            } else if (obj[5] !== undefined && obj[2] !== undefined) {
-                // Case 3: Array index (0-based, F=5, C=2)
-                fValue = obj[5] || '';
-                cValue = obj[2] || '';
-            } else {
-                // Case 4: Try to find values by header names
-                const headers = Object.keys(obj);
-                const fKey = headers.find(k => k.toLowerCase().includes('firstname') || headers[5];
-                const cKey = headers.find(k => k.toLowerCase().includes('lastname') || headers[2];
-                fValue = fKey ? obj[fKey] || '' : '';
-                cValue = cKey ? obj[cKey] || '' : '';
-            }
-            
+            const fValue = getValue(['F', 'f', 'FirstName', 'firstname', 'Name', 'name', 5]);
+            const cValue = getValue(['C', 'c', 'LastName', 'lastname', 2]);
             h3.textContent = `${fValue}, ${cValue}`;
             itemDiv.appendChild(h3);
             
-            // Add column G (or equivalent) as bold/italic paragraph if it exists
-            const gValue = obj['G'] || obj['g'] || obj[6] || 
-                          Object.values(obj).find(v => typeof v === 'string' && v.includes('Party'));
+            // Add column G as bold/italic paragraph if it exists
+            const gValue = getValue(['G', 'g', 'Party', 'party', 6]);
             if (gValue) {
                 const gParagraph = document.createElement('p');
                 gParagraph.innerHTML = `<strong><em>${gValue}</em></strong>`;
@@ -116,26 +108,13 @@ document.addEventListener("DOMContentLoaded", function() {
             // Create unordered list for specific columns
             const ul = document.createElement('ul');
             
-            // Define columns we want to include (H,I,J,K,L or equivalent)
-            const columnsToCheck = [
-                ['H','I','J','K','L'],  // Case 1: Uppercase letters
-                ['h','i','j','k','l'],  // Case 2: Lowercase letters
-                [7,8,9,10,11],          // Case 3: Array indices
-                Object.keys(obj).slice(7,12) // Case 4: First 5 properties after F,G
-            ];
-            
-            // Find which set of columns exists in our data
-            const availableColumns = columnsToCheck.find(colSet => 
-                colSet.some(col => obj[col] !== undefined)
-            ) || [];
-            
-            // Add specified columns to the list
-            availableColumns.forEach(col => {
-                if (obj[col] !== undefined && obj[col] !== null && obj[col] !== '') {
+            // Try to find columns H-L
+            const columnsToShow = ['H', 'I', 'J', 'K', 'L', 'h', 'i', 'j', 'k', 'l', 7, 8, 9, 10, 11];
+            columnsToShow.forEach(col => {
+                const value = obj[col];
+                if (value !== undefined && value !== null && value !== '') {
                     const li = document.createElement('li');
-                    // Try to get a label for the column
-                    const label = typeof col === 'string' ? col : `Field ${col}`;
-                    li.innerHTML = `<strong>${label}:</strong> ${obj[col]}`;
+                    li.innerHTML = `<strong>${col}:</strong> ${value}`;
                     ul.appendChild(li);
                 }
             });
@@ -145,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // CSS styles (unchanged from your preferences)
+    // Add CSS styles
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
@@ -213,14 +192,6 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #000000;
             min-width: 100px;
             display: inline-block;
-        }
-        
-        /* Debug styles */
-        #riding-table pre {
-            background: #f8f8f8;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
         }
     `;
     document.head.appendChild(style);
