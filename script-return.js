@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const districtName = await response.text();
             console.log("District Name:", districtName);
 
-            // Second API call to Google Script
+            // Second API call to Google Script - UPDATED URL
             const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyCotN8vkC8HzLZ4IUHXLDwg9RsKbc4fJZRFZWOlJ8SQOAKMsdhe1SH4kj7h0dRKnYS/exec?search=${encodeURIComponent(districtName)}`;
             const apiResponse = await fetch(googleScriptUrl);
             if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
@@ -64,31 +64,41 @@ document.addEventListener("DOMContentLoaded", function() {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
             
-            // Add Riding as h3 (if exists)
-            if (obj['Riding']) {
-                const h3 = document.createElement('h3');
-                h3.textContent = obj['Riding'];
-                itemDiv.appendChild(h3);
+            // Create h3 with columns F and C
+            const h3 = document.createElement('h3');
+            const fValue = obj['F'] || '';
+            const cValue = obj['C'] || '';
+            h3.textContent = `${fValue}, ${cValue}`;
+            itemDiv.appendChild(h3);
+            
+            // Add column G as bold/italic paragraph if it exists
+            if (obj['G']) {
+                const gParagraph = document.createElement('p');
+                gParagraph.innerHTML = `<strong><em>${obj['G']}</em></strong>`;
+                itemDiv.appendChild(gParagraph);
             }
             
-            // Create ordered list for other properties
-            const ol = document.createElement('ol');
+            // Create unordered list for specific columns
+            const ul = document.createElement('ul');
             
-            // Add all properties except 'Riding'
-            Object.entries(obj).forEach(([key, value]) => {
-                if (key !== 'Riding' && value !== undefined) {
+            // Define columns we want to include
+            const columnsToShow = ['H', 'I', 'J', 'K', 'L'];
+            
+            // Add specified columns to the list
+            columnsToShow.forEach(col => {
+                if (obj[col] !== undefined && obj[col] !== '') {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${key}:</strong> ${value}`;
-                    ol.appendChild(li);
+                    li.innerHTML = `<strong>${col}:</strong> ${obj[col]}`;
+                    ul.appendChild(li);
                 }
             });
             
-            itemDiv.appendChild(ol);
+            itemDiv.appendChild(ul);
             container.appendChild(itemDiv);
         });
     }
 
-    // Updated CSS styles with your preferences
+    // CSS styles (unchanged from your preferences)
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
@@ -140,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
             font-size: 18px;
         }
         
-        #riding-table ol {
+        #riding-table ul {
             margin: 10px 0 0 0;
             padding-left: 20px;
             color: #000000;
