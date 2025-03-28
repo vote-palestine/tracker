@@ -146,11 +146,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table .no-data {
-            color: #95c892;
+            color: #f22248;
             padding: 15px;
             background: #000000;
             border-radius: 4px;
             text-align: center;
+            font-weight: bold;
         }
         
         .candidates-table {
