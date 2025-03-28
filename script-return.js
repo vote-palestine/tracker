@@ -100,10 +100,10 @@ document.addEventListener("DOMContentLoaded", function() {
             incumbentCell.textContent = candidate['Incumbent'] ? 'Yes' : 'No';
             row.appendChild(incumbentCell);
             
-            // Q1-Q5
+            // Map Q1-Q5 to Demand.e 1-5
             for (let i = 1; i <= 5; i++) {
                 const qCell = document.createElement('td');
-                qCell.textContent = candidate[`Q${i}`] || '';
+                qCell.textContent = candidate[`Demand.e ${i}`] || '';
                 row.appendChild(qCell);
             }
             
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
         container.appendChild(table);
     }
 
-    // CSS styles with table-specific additions
+    // Updated CSS with black font for table rows
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
@@ -158,6 +158,7 @@ document.addEventListener("DOMContentLoaded", function() {
             border-collapse: collapse;
             margin-bottom: 25px;
             background: #b0ecac;
+            color: #000000; /* Black font for all table text */
         }
         
         .candidates-table th {
@@ -172,6 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
             padding: 10px 12px;
             border: 1px solid #e1e1e1;
             vertical-align: top;
+            color: #000000; /* Black font for table cells */
         }
         
         .candidates-table tr:nth-child(even) {
