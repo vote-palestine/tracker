@@ -146,9 +146,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         #riding-table .no-data {
-            color: #5bc0de;
+            color: #95c892;
             padding: 15px;
-            background: #d9edf7;
+            background: #000000;
             border-radius: 4px;
             text-align: center;
         }
