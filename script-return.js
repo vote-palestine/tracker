@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function displayDataAsTable(jsonData, container) {
         // Check if data is valid
-        if (!jsonData || !Array.isArray(jsonData) {
+        if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
             container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
             return;
         }
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Add column headers
         const headers = ['Candidate', 'Party', 'Incumbent', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
-        headers.forEach(headerText => {
+        headers.forEach(function(headerText) {
             const th = document.createElement('th');
             th.textContent = headerText;
             headerRow.appendChild(th);
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const tbody = document.createElement('tbody');
         
         // Add each candidate as a row
-        jsonData.forEach(candidate => {
+        jsonData.forEach(function(candidate) {
             if (!candidate) return;
             
             const row = document.createElement('tr');
