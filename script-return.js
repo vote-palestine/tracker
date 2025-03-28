@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function() {
             districtHeading.textContent = `Candidates in ${districtName}`;
             ridingTableDiv.appendChild(districtHeading);
 
-            // Display the data
-            displayDataInDiv(jsonData, ridingTableDiv);
+            // Display the data as a table
+            displayDataAsTable(jsonData, ridingTableDiv);
 
         } catch (error) {
             console.error("Error:", error);
@@ -50,56 +50,77 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    function displayDataInDiv(jsonData, container) {
+    function displayDataAsTable(jsonData, container) {
         // Check if data is valid
-        if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
+        if (!jsonData || !Array.isArray(jsonData) {
             container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
             return;
         }
 
-        // Process each candidate in the data array
+        // Create table element
+        const table = document.createElement('table');
+        table.className = 'candidates-table';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        // Add column headers
+        const headers = ['Candidate', 'Party', 'Incumbent', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        // Add each candidate as a row
         jsonData.forEach(candidate => {
             if (!candidate) return;
             
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'data-item';
+            const row = document.createElement('tr');
             
-            // Create h3 with Candidate and Party
-            const h3 = document.createElement('h3');
-            h3.textContent = `${candidate['Candidat.e'] || ''}, ${candidate['Party - Parti'] || ''}`;
-            itemDiv.appendChild(h3);
+            // Candidate Name
+            const nameCell = document.createElement('td');
+            nameCell.textContent = candidate['Candidat.e'] || '';
+            row.appendChild(nameCell);
             
-            // Add Incumbent as bold/italic paragraph if it exists
-            if (candidate['Incumbent']) {
-                const incumbentPara = document.createElement('p');
-                incumbentPara.innerHTML = `<strong><em>${candidate['Incumbent']}</em></strong>`;
-                itemDiv.appendChild(incumbentPara);
-            }
+            // Party
+            const partyCell = document.createElement('td');
+            partyCell.textContent = candidate['Party - Parti'] || '';
+            row.appendChild(partyCell);
             
-            // Create unordered list for Demands
-            const ul = document.createElement('ul');
+            // Incumbent (Yes/No)
+            const incumbentCell = document.createElement('td');
+            incumbentCell.textContent = candidate['Incumbent'] ? 'Yes' : 'No';
+            row.appendChild(incumbentCell);
             
-            // Add each Demand.e field that exists
+            // Q1-Q5
             for (let i = 1; i <= 5; i++) {
-                const demandKey = `Demand.e ${i}`;
-                if (candidate[demandKey]) {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${demandKey}:</strong> ${candidate[demandKey]}`;
-                    ul.appendChild(li);
-                }
+                const qCell = document.createElement('td');
+                qCell.textContent = candidate[`Q${i}`] || '';
+                row.appendChild(qCell);
             }
             
-            itemDiv.appendChild(ul);
-            container.appendChild(itemDiv);
+            tbody.appendChild(row);
         });
+        
+        table.appendChild(tbody);
+        container.appendChild(table);
     }
 
-    // CSS styles
+    // CSS styles with table-specific additions
     const style = document.createElement('style');
     style.textContent = `
         #riding-table {
             margin-top: 20px;
             font-family: Arial, sans-serif;
+            width: 100%;
         }
         
         #riding-table > h3 {
@@ -132,42 +153,33 @@ document.addEventListener("DOMContentLoaded", function() {
             text-align: center;
         }
         
-        #riding-table .data-item {
+        .candidates-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 25px;
-            padding: 15px;
-            border: 1px solid #e1e1e1;
-            border-radius: 6px;
             background: #b0ecac;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        #riding-table .data-item h3 {
-            color: #000000;
-            margin: 0 0 10px 0;
-            font-size: 18px;
+        .candidates-table th {
+            background-color: #8fd988;
+            color: #000;
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #e1e1e1;
         }
         
-        #riding-table .data-item p {
-            margin: 0 0 10px 0;
-            font-size: 16px;
+        .candidates-table td {
+            padding: 10px 12px;
+            border: 1px solid #e1e1e1;
+            vertical-align: top;
         }
         
-        #riding-table ul {
-            margin: 10px 0 0 0;
-            padding-left: 20px;
-            color: #000000;
+        .candidates-table tr:nth-child(even) {
+            background-color: #c5f0c0;
         }
         
-        #riding-table li {
-            margin-bottom: 6px;
-            line-height: 1.4;
-            padding-left: 5px;
-        }
-        
-        #riding-table strong {
-            color: #000000;
-            min-width: 100px;
-            display: inline-block;
+        .candidates-table tr:hover {
+            background-color: #a0e69a;
         }
     `;
     document.head.appendChild(style);
