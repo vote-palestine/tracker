@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const headerRow = document.createElement('tr');
         
         // Add column headers
-        const headers = ['Candidate', 'Party', 'Incumbent', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
+        const headers = ['Candidate', 'Party', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
         headers.forEach(function(headerText) {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -87,7 +87,8 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Candidate Name
             const nameCell = document.createElement('td');
-            nameCell.textContent = candidate['Candidat.e'] || '';
+            var textContent = candidate['Incumbent'] ? ' (Incumbent)' : '';
+            nameCell.textContent = candidate['Candidat.e'] +  textContent || '';
             row.appendChild(nameCell);
             
             // Party
@@ -95,10 +96,10 @@ document.addEventListener("DOMContentLoaded", function() {
             partyCell.textContent = candidate['Party - Parti'] || '';
             row.appendChild(partyCell);
             
-            // Incumbent (Yes/No)
-            const incumbentCell = document.createElement('td');
-            incumbentCell.textContent = candidate['Incumbent'] ? 'Yes' : 'No';
-            row.appendChild(incumbentCell);
+            // // Incumbent (Yes/No)
+            // const incumbentCell = document.createElement('td');
+            // incumbentCell.textContent = candidate['Incumbent'] ? 'Yes' : 'No';
+            // row.appendChild(incumbentCell);
             
             // Map Q1-Q5 to Demand.e 1-5
             for (let i = 1; i <= 5; i++) {
