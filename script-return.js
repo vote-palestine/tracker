@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Map Q1-Q5 to Demand.e 1-5
             for (let i = 1; i <= 5; i++) {
                 const qCell = document.createElement('td');
-                qCell.textContent = candidate[`Demand.e ${i}`] || '';
+                qCell.textContent = candidate[`${i}`] || '';
                 row.appendChild(qCell);
             }
             
