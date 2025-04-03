@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
     style.textContent = `
         #riding-table {
             margin-top: 20px;
-            font-family: Arial, sans-serif;
+            // font-family: Arial, sans-serif;
             width: 100%;
         }
         
