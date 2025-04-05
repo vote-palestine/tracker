@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const jsonData = await apiResponse.json();
             console.log("API Response Data:", jsonData);
 
-            // Clear the container completely before adding new content
+            // Clear the container entirely before adding new content
             ridingTableDiv.innerHTML = '';
 
             // Add district heading
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const headerRow = document.createElement('tr');
         
         // Add column headers
-        const headers = ['Candidate', 'Party', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
+        const headers = ['Candidate', 'Party', 'D1', 'D2', 'D3', 'D4', 'D5'];
         headers.forEach(function(headerText) {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // incumbentCell.textContent = candidate['Incumbent'] ? 'Yes' : 'No';
             // row.appendChild(incumbentCell);
             
-            // Map Q1-Q5 to Demand.e 1-5
+            // Map D1-D5 to Demand.e 1-5
             for (let i = 1; i <= 5; i++) {
                 const qCell = document.createElement('td');
                 qCell.textContent = candidate[`${i}`] || '';
