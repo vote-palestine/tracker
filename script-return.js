@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Add district heading
             const districtHeading = document.createElement('h3');
-            districtHeading.textContent = `Candidates in ${districtName}`;
+            districtHeading.textContent = `${districtName}`;
             ridingTableDiv.appendChild(districtHeading);
 
             // Display the data as a table
@@ -46,14 +46,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } catch (error) {
             console.error("Error:", error);
-            ridingTableDiv.innerHTML = '<p class="error">Error loading data. Please try again later.</p>';
+            ridingTableDiv.innerHTML = '<p class="error">Error, please try again later. Erreur, veuillez recommencer plus tard.</p>';
         }
     });
 
     function displayDataAsTable(jsonData, container) {
         // Check if data is valid
         if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
-            container.innerHTML += '<p class="no-data">No candidate data found for this riding.</p>';
+            container.innerHTML += '<p class="no-data">No candidate data found for this riding. Aucun candidat.e trouvé.e dans votre circonscription.</p>';
             return;
         }
 
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const headerRow = document.createElement('tr');
         
         // Add column headers
-        const headers = ['Candidate', 'Party', 'D1', 'D2', 'D3', 'D4', 'D5'];
+        const headers = ['Candidat.e', 'Party-Parti', 'D1', 'D2', 'D3', 'D4', 'D5'];
         headers.forEach(function(headerText) {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Candidate Name
             const nameCell = document.createElement('td');
-            var textContent = candidate['Incumbent'] ? ' (Incumbent)' : '';
+            var textContent = candidate['Incumbent'] ? ' (Incumbent-En exercice)' : '';
             nameCell.textContent = candidate['Candidat.e'] +  textContent || '';
             row.appendChild(nameCell);
             
