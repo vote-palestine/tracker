@@ -8,13 +8,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/;
         
         if (!postalCodeRegex.test(postalCode)) {
-            alert("Please enter a valid Canadian postal code.");
+            alert("Invalid postal code. Code postal invalid.");
             return;
         }
 
         // Show loading state
         const ridingTableDiv = document.getElementById('riding-table');
-        ridingTableDiv.innerHTML = '<div class="loading">Loading data...</div>';
+        ridingTableDiv.innerHTML = '<div class="loading">Loading... En cours...</div>';
 
         try {
             // First API call to get district name
