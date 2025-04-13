@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("address").addEventListener("submit", async function(event) {
         event.preventDefault();
-        console.log("Form submitted!");
+        console.log("Form submitted!!");
 
         // Get and validate postal code
         const postalCode = document.getElementById("postal").value.replace(/\s+/g, "").toUpperCase().trim();
