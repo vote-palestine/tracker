@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 qCell.textContent = "SEND AN EMAIL?"
                 qCell.colSpan = 5
                 qCell.className = "red-row"
-                row.appendChild()
+                row.appendChild(qCell)
             } else {
                 for (let i = 1; i <= 5; i++) {
                     const qCell = document.createElement('td');
