@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("District Name:", districtName);
 
             // Second API call to Google Script
-            const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzuFBL9i1MTTTvbWtThLOHu_atVINKRmts_i_usdJNqQqCR9LxbfrqeT-uZzFRWCPDu/exec?search=${encodeURIComponent(districtName)}`;
+            const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyOjNZfGFfLhdo9jMRghcx3hURU6qcbnwNloZ7c9m2RyERASBPRYOGrK28Cv7mVuPs/exec?search=${encodeURIComponent(districtName)}`;
             const apiResponse = await fetch(googleScriptUrl);
             if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
             
