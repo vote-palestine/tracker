@@ -102,11 +102,21 @@ document.addEventListener("DOMContentLoaded", function() {
             // row.appendChild(incumbentCell);
             
             // Map D1-D5 to Demand.e 1-5
-            for (let i = 1; i <= 5; i++) {
+
+            if (candidate["1"] == '' && candidate["2"] == '' && candidate["3"] == '' && candidate["4"] == '' && candidate["5"] == '') {
                 const qCell = document.createElement('td');
-                qCell.textContent = candidate[`${i}`] || '';
-                row.appendChild(qCell);
+                qCell.textContent = "SEND AN EMAIL?"
+                qCell.colSpan = 5
+                qCell.className = "red-row"
+                row.appendChild()
+            } else {
+                for (let i = 1; i <= 5; i++) {
+                    const qCell = document.createElement('td');
+                    qCell.textContent = candidate[`${i}`] || '';
+                    row.appendChild(qCell);
+                }
             }
+            
             
             tbody.appendChild(row);
         });
@@ -184,6 +194,14 @@ document.addEventListener("DOMContentLoaded", function() {
         
         .candidates-table tr:hover {
             background-color: #a0e69a;
+        }
+
+        .candidates-table tr.red-row {
+            background-color: hsla(var(--safeDarkAccent-hsl),0.75);
+        }
+
+        .candidates-table tr.red-row:hover {
+            background-color: hsla(var(--safeDarkAccent-hsl),1);
         }
     `;
     document.head.appendChild(style);
