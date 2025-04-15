@@ -8,13 +8,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/;
         
         if (!postalCodeRegex.test(postalCode)) {
-            alert("Invalid postal code. Code postal invalid.");
+            alert("ode postal invalid.");
             return;
         }
 
         // Show loading state
         const ridingTableDiv = document.getElementById('riding-table');
-        ridingTableDiv.innerHTML = '<div class="loading">Loading... En cours...</div>';
+        ridingTableDiv.innerHTML = '<div class="loading">En cours...</div>';
 
         try {
             // First API call to get district name
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function displayDataAsTable(jsonData, container) {
         // Check if data is valid
         if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
-            container.innerHTML += '<p class="no-data">No candidate data found for this riding. Aucun candidat.e trouvé.e dans votre circonscription.</p>';
+            container.innerHTML += '<p class="no-data">Aucun candidat.e trouvé.e dans votre circonscription.</p>';
             return;
         }
 
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const headerRow = document.createElement('tr');
         
         // Add column headers
-        const headers = ['Candidat.e', 'Party-Parti', 'D1', 'D2', 'D3', 'D4', 'D5'];
+        const headers = ['Candidat.e', 'Parti', 'D1', 'D2', 'D3', 'D4', 'D5'];
         headers.forEach(function(headerText) {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -87,13 +87,30 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Candidate Name
             const nameCell = document.createElement('td');
-            var textContent = candidate['Incumbent'] ? ' (Incumbent-En exercice)' : '';
+            var textContent = candidate['Incumbent'] ? ' (sortant.e)' : '';
             nameCell.textContent = candidate['Candidat.e'] +  textContent || '';
             row.appendChild(nameCell);
             
             // Party
             const partyCell = document.createElement('td');
-            partyCell.textContent = candidate['Party - Parti'] || '';
+            const party = ''
+            switch(candidate['Party - Parti']) {
+                case 'NDP-NPD':
+                  party = 'NPD'
+                  break;
+                case 'CPC-PCC':
+                  party = 'PCC'
+                  break;
+                case 'LPC-PLC':
+                  party = 'PLC'
+                  break;
+                case 'Green Party.i vert':
+                  party = 'Parti vert'
+                  break;
+                default:
+                  party = candidate['Party - Parti']
+              } 
+            partyCell.textContent = party
             row.appendChild(partyCell);
             
             // // Incumbent (Yes/No)
@@ -106,8 +123,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (candidate[`1`] == '' && candidate[`2`] == '' && candidate[`3`] == '' && candidate[`4`] == '' && candidate[`5`] == '') {
                 const qCell = document.createElement('td');
                 const hyperlink = document.createElement("a");
-                hyperlink.href = "/pledge"
-                hyperlink.innerHTML = "<u>SEND AN EMAIL?</u>"
+                hyperlink.href = "/fr-sengager"
+                hyperlink.innerHTML = "<u>ENVOYER UN COURRIEL?</u>"
                 qCell.appendChild(hyperlink)
                 qCell.colSpan = 5
                 row.appendChild(qCell)
