@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Party
             const partyCell = document.createElement('td');
-            const party = ''
+            var party = ''
             switch(candidate['Party - Parti']) {
                 case 'NDP-NPD':
                   party = 'NDP'
