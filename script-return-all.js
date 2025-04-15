@@ -105,7 +105,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (candidate[`1`] == '' && candidate[`2`] == '' && candidate[`3`] == '' && candidate[`4`] == '' && candidate[`5`] == '') {
                 const qCell = document.createElement('td');
-                qCell.textContent = "SEND AN EMAIL?"
+                const hyperlink = document.createElement("a");
+                hyperlink.href = "/pledge"
+                hyperlink.innerHTML="<u>SEND AN EMAIL?</u>"
+                qCell.innerHTML = hyperlink
                 qCell.colSpan = 5
                 row.appendChild(qCell)
                 row.className = "red-row"
