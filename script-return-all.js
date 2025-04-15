@@ -107,8 +107,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 const qCell = document.createElement('td');
                 const hyperlink = document.createElement("a");
                 hyperlink.href = "/pledge"
-                hyperlink.innerHTML="<u>SEND AN EMAIL?</u>"
-                qCell.innerHTML = hyperlink
+                hyperlink.innerHTML = "<u>SEND AN EMAIL?</u>"
+                qCell.appendChild(hyperlink)
                 qCell.colSpan = 5
                 row.appendChild(qCell)
                 row.className = "red-row"
