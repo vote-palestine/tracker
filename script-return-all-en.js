@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const hyperlink = document.createElement("a");
                 hyperlink.href = "/pledge"
                 hyperlink.innerHTML = "<u>SEND AN EMAIL?</u>"
+                hyperlink.target="_blank"
                 qCell.appendChild(hyperlink)
                 qCell.colSpan = 5
                 row.appendChild(qCell)
