@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Map D1-D5 to Demand.e 1-5
 
-            if (candidate["1"] == '' && candidate["2"] == '' && candidate["3"] == '' && candidate["4"] == '' && candidate["5"] == '') {
+            if (candidate[`1`] == '' && candidate[`2`] == '' && candidate[`3`] == '' && candidate[`4`] == '' && candidate[`5`] == '') {
                 const qCell = document.createElement('td');
                 qCell.textContent = "SEND AN EMAIL?"
                 qCell.colSpan = 5
