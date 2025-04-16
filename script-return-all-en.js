@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("District Name:", districtName);
 
             // Second API call to Google Script
-            const googleScriptUrl = `https://script.google.com/macros/s/AKfycbyPrqzNLU-nVEfzxCG3N_hIktt0rxpWDGR-4ZNXsQz29YtR0ci9c_sUzqC504JHYQES/exec?search=${encodeURIComponent(districtName)}`;
+            const googleScriptUrl = `https://script.google.com/macros/s/AKfycbxI6CG1DU9krLfBSudMnBYZtpR3O7Z-n-dciSyKWWh-clGBCRF4SjQIXvNp6lpS68IU/exec?search=${encodeURIComponent(districtName)}`;
             const apiResponse = await fetch(googleScriptUrl);
             if (!apiResponse.ok) throw new Error("Failed to fetch riding data");
             
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const qCell = document.createElement('td');
                 const hyperlink = document.createElement("a");
                 hyperlink.href = "/pledge"
-                hyperlink.innerHTML = "<u>SEND AN EMAIL?</u>"
+                hyperlink.innerHTML = "<u>SEND AN EMAIL!</u>"
                 hyperlink.target="_blank"
                 qCell.appendChild(hyperlink)
                 qCell.colSpan = 5
