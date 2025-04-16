@@ -104,6 +104,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 case 'LPC-PLC':
                   party = 'LPC'
                   break;
+                case 'Liberal Party.i libéral':
+                  party = 'LPC'
+                  break;
                 case 'Green Party.i vert':
                   party = 'Green Party'
                   break;
